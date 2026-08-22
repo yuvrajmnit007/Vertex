@@ -7,9 +7,7 @@ const Footer = () => {
         <div className="md:max-w-96">
           <img className="w-36 h-auto" src={assets.logo} alt="logo" />
           <p className="mt-6 text-sm">
-            Lorem Ipsum has been the industry's standard dummy text ever since
-            the 1500s, when an unknown printer took a galley of type and
-            scrambled it to make a type specimen book.
+            Vertex is a modern movie and entertainment booking platform that makes discovering and booking your favorite movies, shows, and events simple and convenient. Explore movies, check showtimes, choose your preferred seats, and book tickets seamlessly. With a smooth interface and real-time seat availability, Vertex brings the complete cinema booking experience right to your fingertips.
           </p>
           <div className="flex items-center gap-2 mt-4">
             <img
@@ -41,14 +39,14 @@ const Footer = () => {
           <div>
             <h2 className="font-semibold mb-5">Get in touch</h2>
             <div className="text-sm space-y-2">
-              <p>+250-784-652-570</p>
-              <p>elyseniyibizi@gmail.com</p>
+              <p>+91-9876543210</p>
+              <p>vertex@gmail.com</p>
             </div>
           </div>
         </div>
       </div>
       <p className="pt-4 text-center text-sm pb-5">
-        Copyright {new Date().getFullYear()} © ElyséeDev. All Right Reserved.
+        Copyright {new Date().getFullYear()} © Vertex. All Right Reserved.
       </p>
     </footer>
   );

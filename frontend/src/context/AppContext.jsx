@@ -1,11 +1,26 @@
-import React from 'react'
+import { createContext, useContext } from "react";
+import { useUser } from "@clerk/clerk-react";
 
-const AppContext = () => {
+const AppContext = createContext();
+
+export const AppProvider = ({ children }) => {
+  const { user } = useUser();
+
+  // You can add any other global states or functions here later
+  const favoriteMovies = [];
+
+  const value = {
+    user,
+    favoriteMovies,
+  };
+
   return (
-    <div>
-      
-    </div>
-  )
-}
+    <AppContext.Provider value={value}>
+      {children}
+    </AppContext.Provider>
+  );
+};
 
-export default AppContext
+export const useAppContext = () => {
+  return useContext(AppContext);
+};
