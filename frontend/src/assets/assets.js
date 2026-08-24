@@ -5,10 +5,14 @@ import googlePlay from './googlePlay.svg'
 import appStore from './appStore.svg'
 import screenImage from './screenImage.svg'
 import profile from './profile.png'
+import WarnerBros from './Warner-Bros.webp'
+import Prime from './Prime.webp'
 
 export const assets = {
     logo,
     marvelLogo,
+    WarnerBros, 
+    Prime,
     googlePlay,
     appStore,
     screenImage,

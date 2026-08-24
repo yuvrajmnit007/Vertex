@@ -19,39 +19,47 @@ const heroSlides = [
   },
   {
     id: 2,
-    bgImage: 'url("/backgroundImage2.webp")', // Ensure you have this or swap with another asset/url
-    logo: assets.marvelLogo, // You can use a different logo asset if available
-    title: "Avengers:\nSecret Wars",
-    genre: "Sci-Fi | Action | Thriller",
-    year: "2026",
-    duration: "2h 45m",
-    synopsis:
-      "The multiverse collapses into a singular chaotic reality. Earth's mightiest heroes must band together for the ultimate battle across dimensions.",
+    bgImage: 'url("/backgroundImage3.jpg")', // Ensure you have this or swap with another asset/url
+    logo: assets.WarnerBros, 
+    title: "Interstellar",
+    genre: "Adventure | Drama | Sci-Fi",
+    year: "2014",
+    duration: "2h 49m",
+    synopsis: "When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot, Joseph Cooper, is tasked to pilot a spacecraft, along with a team of researchers, to find a new planet for humans.",
     link: "/movies",
   },
   {
-    id: 2,
-    bgImage: 'url("/backgroundImage2.webp")', // Ensure you have this or swap with another asset/url
+    id: 3,
+    bgImage: 'url("/backgroundImage2.jpg")', // Ensure you have this or swap with another asset/url
     logo: assets.marvelLogo, // You can use a different logo asset if available
-    title: "Avengers:\nSecret Wars",
-    genre: "Sci-Fi | Action | Thriller",
-    year: "2026",
-    duration: "2h 45m",
-    synopsis:
-      "The multiverse collapses into a singular chaotic reality. Earth's mightiest heroes must band together for the ultimate battle across dimensions.",
+    title: "Spider-Man",
+    genre: "Action | Adventure | Sci-Fi",
+    year: "2014",
+    duration: "2h 22m",
+    synopsis: "Peter Parker runs a web of secrets as he balances his high school life with his responsibilities as Spider-Man, while a new threat named Electro emerges in New York City.",
     link: "/movies",
   },
+//   {
+//     id: 4,
+//     bgImage: 'url("/backgroundImage4.jpg")', // Ensure you have this or swap with another asset/url
+//     logo: assets.marvelLogo, // You can use a different logo asset if available
+//     title: "Avengers:\nSecret Wars",
+//     genre: "Sci-Fi | Action | Thriller",
+//     year: "2026",
+//     duration: "2h 45m",
+//     synopsis:
+//       "The multiverse collapses into a singular chaotic reality. Earth's mightiest heroes must band together for the ultimate battle across dimensions.",
+//     link: "/movies",
+//   },
   {
-    id: 2,
-    bgImage: 'url("/backgroundImage2.webp")', // Ensure you have this or swap with another asset/url
-    logo: assets.marvelLogo, // You can use a different logo asset if available
-    title: "Avengers:\nSecret Wars",
-    genre: "Sci-Fi | Action | Thriller",
-    year: "2026",
-    duration: "2h 45m",
-    synopsis:
-      "The multiverse collapses into a singular chaotic reality. Earth's mightiest heroes must band together for the ultimate battle across dimensions.",
-    link: "/movies",
+    id: 5,
+    bgImage: 'url("/backgroundImage5.jpg")', // Ensure you have this or swap with another asset/url
+    logo: assets.Prime, // You can use a different logo asset if available
+    title: "Hanuman",
+    genre: "Action | Drama | Fantasy",
+    year: "2024",
+    duration: "2h 38m",
+    synopsis: "Set against a backdrop of stormy skies and epic landscapes, an immortal divine deity sits in deep meditation, embodying supreme strength, devotion, and cosmic resilience.",link: "/movies",
   },
 ];
 
