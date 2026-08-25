@@ -8,6 +8,7 @@ import MovieCard from "../components/MovieCard";
 import Loading from "../components/Loading";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
+import { dummyShowsData, dummyDateTimeData } from "../assets/assets"; // Dummy data import karein
 
 const MovieDetails = () => {
   const navigate = useNavigate();
@@ -28,10 +29,20 @@ const MovieDetails = () => {
     try {
       const { data } = await axios.get(`/api/show/${id}`);
       if (data.success) {
-        setShow(data);
+        // Handle based on your backend response structure
+        setShow(data.show ? data : { movie: data.movie || data, dateTime: dummyDateTimeData });
       }
     } catch (error) {
-      console.log(error);
+      console.log("Backend API failed, loading from dummy data:", error);
+      
+      // Fallback: Agar backend fail ho jaye toh local shows array se movie dhoond lo
+      const foundMovie = shows.find((m) => m._id === id || m.id == id);
+      if (foundMovie) {
+        setShow({
+          movie: foundMovie,
+          dateTime: dummyDateTimeData, // Dummy dates pass kar rahe hain
+        });
+      }
     }
   };
 
@@ -51,18 +62,23 @@ const MovieDetails = () => {
       }
     } catch (error) {
       console.log(error);
+      toast.error("Something went wrong");
     }
   };
 
   useEffect(() => {
     getShow();
-  }, [id]);
+  }, [id, shows]);
 
-  return show ? (
+  return show && show.movie ? (
     <div className="px-6 md:px-16 lg:px-40 pt-30 md:pt-50">
       <div className="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto">
         <img
-          src={image_base_url + show.movie.poster_path}
+          src={
+            show.movie.poster_path?.startsWith("http")
+              ? show.movie.poster_path
+              : (image_base_url || "") + show.movie.poster_path
+          }
           alt="poster"
           className="max-md:mx-auto rounded-xl h-104 max-w-70 object-cover"
         />
@@ -75,7 +91,7 @@ const MovieDetails = () => {
           </h1>
           <div className="flex items-center gap-2 text-gray-300">
             <StarIcon className="w-5 h-5 text-primary fill-primary" />
-            {show.movie.vote_average.toFixed(1)} User Rating
+            {show.movie.vote_average?.toFixed(1)} User Rating
           </div>
           <p className="text-gray-400 mt-2 text-sm leading-tight max-w-xl">
             {show.movie.overview}
@@ -83,8 +99,8 @@ const MovieDetails = () => {
 
           <p>
             {timeFormat(show.movie.runtime)} •{" "}
-            {show.movie.genres.map((genre) => genre.name).join(", ")} •{" "}
-            {show.movie.release_date.split("-")[0]}
+            {show.movie.genres?.map((genre) => genre.name).join(", ")} •{" "}
+            {show.movie.release_date?.split("-")[0]}
           </p>
 
           <div className="flex items-center flex-wrap gap-4 mt-4">
@@ -104,7 +120,7 @@ const MovieDetails = () => {
             >
               <Heart
                 className={`w-5 h-5 ${
-                  favoriteMovies.find((movie) => movie._id === id)
+                  favoriteMovies.find((movie) => movie._id === id || movie.id == id)
                     ? "fill-primary text-primary"
                     : ""
                 }`}
@@ -114,13 +130,17 @@ const MovieDetails = () => {
         </div>
       </div>
 
-      <p className="text-lg fontmedium mt-20">Your Favorite Cast</p>
+      <p className="text-lg font-medium mt-20">Your Favorite Cast</p>
       <div className="overflow-x-auto no-scrollbar mt-8 pb-4">
         <div className="flex items-center gap-4 w-max px-4">
-          {show.movie.casts.slice(0, 12).map((cast, index) => (
+          {show.movie.casts?.slice(0, 12).map((cast, index) => (
             <div key={index} className="flex flex-col items-center text-center">
               <img
-                src={image_base_url + cast.profile_path}
+                src={
+                  cast.profile_path?.startsWith("http")
+                    ? cast.profile_path
+                    : (image_base_url || "") + cast.profile_path
+                }
                 alt="profile"
                 className="rounded-full h-20 md:h-20 aspect-square object-cover"
               />
@@ -130,7 +150,7 @@ const MovieDetails = () => {
         </div>
       </div>
 
-      <DateSelect dateTime={show.dateTime} id={id} />
+      {show.dateTime && <DateSelect dateTime={show.dateTime} id={id} />}
 
       <p className="text-lg font-medium mt-20 mb-8">You May Also Like</p>
 

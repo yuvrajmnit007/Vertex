@@ -5,8 +5,12 @@ import { useAppContext } from "../context/AppContext";
 
 const MovieCard = ({ movie }) => {
   const navigate = useNavigate();
-
   const { image_base_url } = useAppContext();
+
+  // Handle karein ki agar backdrop_path me already http ya https hai toh base_url na jodein
+  const imageUrl = movie.backdrop_path?.startsWith("http")
+    ? movie.backdrop_path
+    : (image_base_url || "") + movie.backdrop_path;
 
   return (
     <div className="flex flex-col justify-between p-3 bg-gray-800 rounded-2xl hover:-translate-y-1 transition duration-300 w-66">
@@ -15,7 +19,7 @@ const MovieCard = ({ movie }) => {
           navigate(`/movies/${movie._id}`);
           scrollTo(0, 0);
         }}
-        src={image_base_url + movie.backdrop_path}
+        src={imageUrl}
         alt="poster"
         className="rounded-lg h-52 w-full object-cover object-right-bottom cursor-pointer"
       />
@@ -25,7 +29,7 @@ const MovieCard = ({ movie }) => {
       <p className="text-sm text-gray-400 mt-2">
         {new Date(movie.release_date).getFullYear()} •{" "}
         {movie.genres
-          .slice(0, 2)
+          ?.slice(0, 2)
           .map((genre) => genre.name)
           .join(" | ")}{" "}
         • {timeFormat(movie.runtime)}
@@ -43,7 +47,7 @@ const MovieCard = ({ movie }) => {
         </button>
         <p className="flex items-center gap-1 text-sm text-gray-400 mt-1 pr-1">
           <StarIcon className="w-4 h-4 text-primary fill-primary" />
-          {movie.vote_average.toFixed(1)}
+          {movie.vote_average?.toFixed(1)}
         </p>
       </div>
     </div>
