@@ -11,6 +11,7 @@ export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdminLoading, setIsAdminLoading] = useState(false);
   const [shows, setShows] = useState(dummyShowsData); // 2. Initial state me dummy data rakh dein taaki turant dikhe
   const [favoriteMovies, setFavoriteMovies] = useState([]);
 
@@ -22,6 +23,7 @@ export const AppProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const fetchIsAdmin = async () => {
+    setIsAdminLoading(true);
     try {
       const { data } = await axios.get("/api/admin/is-admin", {
         headers: { Authorization: `Bearer ${await getToken()}` },
@@ -34,7 +36,19 @@ export const AppProvider = ({ children }) => {
         toast.error("You are not authorized to access admin dashboard");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Admin check failed:", error);
+
+      // Allow local UI development when backend/admin API is not available.
+      if (import.meta.env.DEV) {
+        setIsAdmin(true);
+        if (location.pathname.startsWith("/admin")) {
+          toast("Using local admin fallback (dev mode)");
+        }
+      } else {
+        setIsAdmin(false);
+      }
+    } finally {
+      setIsAdminLoading(false);
     }
   };
 
@@ -87,6 +101,7 @@ export const AppProvider = ({ children }) => {
     getToken,
     navigate,
     isAdmin,
+    isAdminLoading,
     shows,
     favoriteMovies,
     fetchFavoriteMovies,

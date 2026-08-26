@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { assets } from "../assets/assets";
+import { assets, dummyDateTimeData } from "../assets/assets";
 import Loading from "../components/Loading";
 import { ArrowRightIcon, ClockIcon } from "lucide-react";
 import isoTimeFormat from "../lib/isoTimeFormat";
@@ -24,17 +24,36 @@ const SeatLayout = () => {
   const [occupiedSeats, setOccupiedSeats] = useState([]);
 
   const navigate = useNavigate();
-
-  const { axios, getToken, user } = useAppContext();
+  const { axios, getToken, user, shows } = useAppContext();
 
   const getShow = async () => {
     try {
       const { data } = await axios.get(`/api/show/${id}`);
-      if (data.success) {
-        setShow(data);
+      if (data && data.success) {
+        setShow(data.show ? data : { movie: data.movie || data, dateTime: data.dateTime || dummyDateTimeData });
+        return;
       }
     } catch (error) {
-      console.log(error);
+      console.log("API failed, switching to dummy show data");
+    }
+
+    // Fallback: Agar API fail ho jaye ya response na mile, toh dummy shows se data utha lo
+    const foundMovie = shows?.find((m) => String(m._id) === String(id) || String(m.id) === String(id));
+    
+    // Agar movie mil jaye ya shows array me pehli movie ho, toh turant state set kar do
+    const movieToSet = foundMovie || shows?.[0];
+
+    if (movieToSet) {
+      setShow({
+        movie: movieToSet,
+        dateTime: dummyDateTimeData,
+      });
+    } else {
+      // Agar sab fail ho jaye, tab bhi ek default dummy object de do taaki loading hat jaye
+      setShow({
+        movie: { title: "Dummy Movie" },
+        dateTime: dummyDateTimeData,
+      });
     }
   };
 
@@ -42,11 +61,11 @@ const SeatLayout = () => {
     if (!selectedTime) {
       return toast("Please select time first");
     }
-    if (!selectedSeats.includes(seatId) && selectedSeats.length > 4) {
-      return toast("You can only select 5 seats");
-    }
     if (occupiedSeats.includes(seatId)) {
       return toast("This seat is already booked");
+    }
+    if (!selectedSeats.includes(seatId) && selectedSeats.length >= 5) {
+      return toast("You can only select 5 seats");
     }
     setSelectedSeats((prev) =>
       prev.includes(seatId)
@@ -60,13 +79,17 @@ const SeatLayout = () => {
       <div className="flex flex-wrap items-center justify-center gap-2">
         {Array.from({ length: count }, (_, i) => {
           const seatId = `${row}${i + 1}`;
+          const isOccupied = occupiedSeats.includes(seatId);
+          const isSelected = selectedSeats.includes(seatId);
+
           return (
             <button
               key={seatId}
+              disabled={isOccupied}
               onClick={() => handleSeatClick(seatId)}
-              className={`h-8 w-8 rounded border border-primary/60 cursor-pointer ${
-                selectedSeats.includes(seatId) && "bg-primary text-white"
-              } ${occupiedSeats.includes(seatId) && "opacity-50"}`}
+              className={`h-8 w-8 rounded border border-primary/60 cursor-pointer transition ${
+                isSelected ? "bg-primary text-white" : ""
+              } ${isOccupied ? "opacity-40 bg-gray-700 cursor-not-allowed" : "hover:border-white"}`}
             >
               {seatId}
             </button>
@@ -81,13 +104,11 @@ const SeatLayout = () => {
       const { data } = await axios.get(
         `/api/booking/seats/${selectedTime.showId}`
       );
-      if (data.success) {
-        setOccupiedSeats(data.occupiedSeats);
-      } else {
-        toast.error(data.message);
+      if (data && data.success) {
+        setOccupiedSeats(data.occupiedSeats || []);
       }
     } catch (error) {
-      console.log(error);
+      setOccupiedSeats([]); // Dummy mode ke liye empty array
     }
   };
 
@@ -104,19 +125,19 @@ const SeatLayout = () => {
         { headers: { Authorization: `Bearer ${await getToken()}` } }
       );
 
-      if (data.success) {
+      if (data && data.success) {
         window.location.href = data.url;
       } else {
-        toast.error(data.message);
+        toast.error(data.message || "Booking failed");
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Something went wrong");
     }
   };
 
   useEffect(() => {
     getShow();
-  }, []);
+  }, [id, shows]);
 
   useEffect(() => {
     if (selectedTime) {
@@ -124,26 +145,34 @@ const SeatLayout = () => {
     }
   }, [selectedTime]);
 
+  // Safe Date & Time mapping
+  const dateKey = date || Object.keys(show?.dateTime || {})[0];
+  const availableTimes = show?.dateTime?.[dateKey] || show?.dateTime?.[Object.keys(show?.dateTime || {})[0]] || [];
+
   return show ? (
     <div className="flex flex-col md:flex-row px-6 md:px-16 lg:px-40 py-30 md:pt-50">
       {/* Available Timings */}
       <div className="w-60 bg-primary/10 border border-primary/20 rounded-lg py-10 h-max md:sticky md:top-30">
         <p className="text-lg font-semibold px-6">Available Timings</p>
         <div className="mt-5 space-y-1">
-          {show.dateTime[date].map((item) => (
-            <div
-              key={item.time}
-              onClick={() => setSelectedTime(item)}
-              className={`flex items-center gap-2 px-6 py-2 w-max rounded-r-md cursor-pointer transition ${
-                selectedTime?.time === item.time
-                  ? "bg-primary text-white"
-                  : "hover:bg-primary/20"
-              }`}
-            >
-              <ClockIcon className="w-4 h-4" />
-              <p className="text-sm">{isoTimeFormat(item.time)}</p>
-            </div>
-          ))}
+          {availableTimes.length > 0 ? (
+            availableTimes.map((item) => (
+              <div
+                key={item.time}
+                onClick={() => setSelectedTime(item)}
+                className={`flex items-center gap-2 px-6 py-2 w-max rounded-r-md cursor-pointer transition ${
+                  selectedTime?.time === item.time
+                    ? "bg-primary text-white"
+                    : "hover:bg-primary/20"
+                }`}
+              >
+                <ClockIcon className="w-4 h-4" />
+                <p className="text-sm">{isoTimeFormat(item.time)}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-400 px-6">No timings available</p>
+          )}
         </div>
       </div>
 

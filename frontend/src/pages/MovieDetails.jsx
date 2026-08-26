@@ -8,7 +8,7 @@ import MovieCard from "../components/MovieCard";
 import Loading from "../components/Loading";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
-import { dummyShowsData, dummyDateTimeData } from "../assets/assets"; // Dummy data import karein
+import { dummyDateTimeData } from "../assets/assets";
 
 const MovieDetails = () => {
   const navigate = useNavigate();
@@ -27,20 +27,34 @@ const MovieDetails = () => {
 
   const getShow = async () => {
     try {
+      console.log("Fetching show from API for ID:", id);
       const { data } = await axios.get(`/api/show/${id}`);
       if (data.success) {
-        // Handle based on your backend response structure
         setShow(data.show ? data : { movie: data.movie || data, dateTime: dummyDateTimeData });
+      } else {
+        throw new Error("API success is false");
       }
     } catch (error) {
-      console.log("Backend API failed, loading from dummy data:", error);
-      
-      // Fallback: Agar backend fail ho jaye toh local shows array se movie dhoond lo
-      const foundMovie = shows.find((m) => m._id === id || m.id == id);
+      console.log("API failed or not connected, using fallback dummy shows. Error:", error);
+      console.log("Current shows array in context:", shows);
+
+      // Match _id or id (string or number conversion safe check)
+      const foundMovie = shows.find(
+        (m) => String(m._id) === String(id) || String(m.id) === String(id)
+      );
+
+      console.log("Found movie from local state:", foundMovie);
+
       if (foundMovie) {
         setShow({
           movie: foundMovie,
-          dateTime: dummyDateTimeData, // Dummy dates pass kar rahe hain
+          dateTime: dummyDateTimeData,
+        });
+      } else if (shows.length > 0) {
+        // Agar exact match na mile (testing ke liye), toh pehli movie dikha do taaki page blank na rahe
+        setShow({
+          movie: shows[0],
+          dateTime: dummyDateTimeData,
         });
       }
     }
@@ -67,7 +81,9 @@ const MovieDetails = () => {
   };
 
   useEffect(() => {
-    getShow();
+    if (shows && shows.length > 0) {
+      getShow();
+    }
   }, [id, shows]);
 
   return show && show.movie ? (
@@ -120,7 +136,11 @@ const MovieDetails = () => {
             >
               <Heart
                 className={`w-5 h-5 ${
-                  favoriteMovies.find((movie) => movie._id === id || movie.id == id)
+                  favoriteMovies.find(
+                    (movie) =>
+                      String(movie._id) === String(id) ||
+                      String(movie.id) === String(id)
+                  )
                     ? "fill-primary text-primary"
                     : ""
                 }`}
