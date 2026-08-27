@@ -53,7 +53,7 @@ const Navbar = () => {
             scrollTo(0, 0);
             setIsOpen(false);
           }}
-          to="/theaters"
+          to="/"
         >
           Theaters
         </Link>
@@ -62,11 +62,11 @@ const Navbar = () => {
             scrollTo(0, 0);
             setIsOpen(false);
           }}
-          to="/releases"
+          to="/"
         >
           Releases
         </Link>
-        {/* {favoriteMovies.length > 0 && (
+        {favoriteMovies.length > 0 && (
           <Link
             onClick={() => {
               scrollTo(0, 0);
@@ -76,11 +76,7 @@ const Navbar = () => {
           >
             Favorites
           </Link>
-        )} */}
-        {/* Remove the length check temporarily for debugging */}
-    <Link onClick={() => { scrollTo(0, 0); setIsOpen(false); }} to="/favorite">
-      Favorites
-    </Link>
+        )}
       </div>
 
       <div className="flex items-center gap-8">

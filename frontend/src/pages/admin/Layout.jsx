@@ -2,14 +2,15 @@ import AdminNavbar from "../../components/admin/AdminNavbar";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import { Outlet } from "react-router-dom";
 import { useAppContext } from "../../context/AppContext";
+import { useEffect } from "react";
 import Loading from "../../components/Loading";
 
 const Layout = () => {
-  const { isAdmin, isAdminLoading } = useAppContext();
+  const { isAdmin, fetchIsAdmin } = useAppContext();
 
-  if (isAdminLoading) {
-    return <Loading />;
-  }
+  useEffect(() => {
+    fetchIsAdmin();
+  }, []);
 
   return isAdmin ? (
     <>
@@ -22,9 +23,7 @@ const Layout = () => {
       </div>
     </>
   ) : (
-    <div className="min-h-[60vh] flex items-center justify-center text-center px-4">
-      <p className="text-gray-400">Admin access is not available for this account.</p>
-    </div>
+    <Loading />
   );
 };
 

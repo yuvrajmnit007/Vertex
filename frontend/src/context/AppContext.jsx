@@ -3,7 +3,6 @@ import axios from "axios";
 import { useAuth, useUser } from "@clerk/clerk-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { dummyShowsData } from "../assets/assets"; // 1. Dummy data import karein
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -11,11 +10,10 @@ export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isAdminLoading, setIsAdminLoading] = useState(false);
-  const [shows, setShows] = useState(dummyShowsData); // 2. Initial state me dummy data rakh dein taaki turant dikhe
+  const [shows, setShows] = useState([]);
   const [favoriteMovies, setFavoriteMovies] = useState([]);
 
-  const image_base_url = import.meta.env.VITE_TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p/original";
+  const image_base_url = import.meta.env.VITE_TMDB_IMAGE_BASE_URL;
 
   const { user } = useUser();
   const { getToken } = useAuth();
@@ -23,7 +21,6 @@ export const AppProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const fetchIsAdmin = async () => {
-    setIsAdminLoading(true);
     try {
       const { data } = await axios.get("/api/admin/is-admin", {
         headers: { Authorization: `Bearer ${await getToken()}` },
@@ -36,19 +33,7 @@ export const AppProvider = ({ children }) => {
         toast.error("You are not authorized to access admin dashboard");
       }
     } catch (error) {
-      console.error("Admin check failed:", error);
-
-      // Allow local UI development when backend/admin API is not available.
-      if (import.meta.env.DEV) {
-        setIsAdmin(true);
-        if (location.pathname.startsWith("/admin")) {
-          toast("Using local admin fallback (dev mode)");
-        }
-      } else {
-        setIsAdmin(false);
-      }
-    } finally {
-      setIsAdminLoading(false);
+      console.error(error);
     }
   };
 
@@ -62,8 +47,7 @@ export const AppProvider = ({ children }) => {
         toast.error(data.message);
       }
     } catch (error) {
-      console.error("Backend fetch failed, using dummy shows data:", error);
-      // Agar backend se data na mile, toh dummy data hi rehne dein
+      console.error(error);
     }
   };
 
@@ -101,7 +85,6 @@ export const AppProvider = ({ children }) => {
     getToken,
     navigate,
     isAdmin,
-    isAdminLoading,
     shows,
     favoriteMovies,
     fetchFavoriteMovies,
