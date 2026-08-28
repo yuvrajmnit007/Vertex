@@ -10,6 +10,7 @@ export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdminLoading, setIsAdminLoading] = useState(true);
   const [shows, setShows] = useState([]);
   const [favoriteMovies, setFavoriteMovies] = useState([]);
 
@@ -21,6 +22,7 @@ export const AppProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const fetchIsAdmin = async () => {
+    setIsAdminLoading(true);
     try {
       const { data } = await axios.get("/api/admin/is-admin", {
         headers: { Authorization: `Bearer ${await getToken()}` },
@@ -33,7 +35,10 @@ export const AppProvider = ({ children }) => {
         toast.error("You are not authorized to access admin dashboard");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Admin check failed:", error);
+      setIsAdmin(false);
+    } finally {
+      setIsAdminLoading(false);
     }
   };
 
@@ -85,6 +90,7 @@ export const AppProvider = ({ children }) => {
     getToken,
     navigate,
     isAdmin,
+    isAdminLoading,
     shows,
     favoriteMovies,
     fetchFavoriteMovies,

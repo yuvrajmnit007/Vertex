@@ -12,23 +12,23 @@ import userRouter from "./routes/userRoutes.js";
 import { stripeWebhooks } from "./controllers/stripeWebhooks.js";
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 await connectDB();
 
-// Stripe Webhooks Route
-app.use(
+// 1. Stripe Webhook Route (Must use express.raw BEFORE global express.json)
+app.post(
   "/api/stripe",
   express.raw({ type: "application/json" }),
   stripeWebhooks
 );
 
-// Middleware
+// 2. Global Middleware
 app.use(express.json());
 app.use(cors());
 app.use(clerkMiddleware());
 
-// API Routes
+// 3. API Routes
 app.get("/", (req, res) => res.send("Server is Live!"));
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/show", showRouter);

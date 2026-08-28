@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import Title from "../../components/admin/Title";
 import BlurCircle from "../../components/BlurCircle";
-import { dateFormat } from "../../lib/dateFormat";
+import { dateFormat } from "../../lib/DateFormat";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
 
@@ -58,12 +58,14 @@ const Dashboard = () => {
 
       if (data.success) {
         setDashboardData(data.dashboardData);
-        setLoading(false);
       } else {
-        toast.error(data.message);
+        toast.error(data.message || "Failed to fetch dashboard data");
       }
     } catch (error) {
-      toast.error("Error fetching dashboard data:", error);
+      console.error("Error fetching dashboard data:", error);
+      toast.error("Failed to load dashboard data");
+    } finally {
+      setLoading(false);
     }
   };
 
